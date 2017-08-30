@@ -1,0 +1,226 @@
+\documentclass[submit]{harvardml}
+
+% Put in your full name and email address.
+\name{Your Name}
+\email{email@fas.harvard.edu}
+
+% List any people you worked with.
+\collaborators{%
+  John Doe,
+  Fred Doe
+}
+
+
+% You don't need to change these.
+\course{CS281-F17}
+\assignment{Assignment \#0}
+\duedate{5:00pm Sept. 8th}
+\newcommand{\attr}[1]{\textsf{#1}}
+\usepackage[OT1]{fontenc}
+\usepackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage[pdftex]{graphicx}
+\usepackage{fullpage}
+\usepackage{palatino}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{todonotes}
+\usepackage{listings}
+\usepackage{common}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{xifthen}
+\usepackage{soul}
+\usepackage{url}
+\usepackage[mmddyyyy,hhmmss]{datetime}
+\definecolor{verbgray}{gray}{0.9}
+% Some useful macros.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\cov}{\text{cov}}
+\renewcommand{\v}[1]{\mathbf{#1}}
+
+\begin{document}
+\begin{center}
+    {\Large Homework 0: Preliminary}
+\end{center}
+
+\subsection*{Introduction}
+
+There is a mathematical component and a programming component to this homework.
+Please submit your PDF and Python files to Canvas, and push all of your work
+to your GitHub repository. If a question requires you to make any plots,
+please include those in the writeup.
+
+This assignment is intended to ensure that you have the background required for CS281,
+and have studied the mathematical review notes provided in section.
+You should be able to answer the problems below \textit{without} complicated calculations.
+All questions are worth $70/6 = 11.\bar{6}$ points unless stated otherwise.
+
+\newpage
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% PROBLEM 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Variance and Covariance}
+\begin{problem}
+Let $X$ and~$Y$ be two independent random variables.
+
+\begin{enumerate}[label=(\alph*)]
+\item Show that the independence of~$X$ and~$Y$ implies that their
+covariance is zero.
+
+\item Zero covariance \textit{does not} imply independence between two
+      random variables. Give an example of this.
+
+\item For a scalar constant~$a$, show the following two properties:
+\begin{align*}
+  \E(X + aY) &= \E(X) + a\E(Y)\\
+  \var(X + aY) &= \var(X) + a^2\var(Y)
+\end{align*}
+\end{enumerate}
+\end{problem}
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%% PROBLEM 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Densities}
+\begin{problem}
+Answer the following questions:
+\begin{enumerate}[label=(\alph*)]
+  \item Can a probability density function (pdf) ever take values greater than 1?
+  \item Let $X$ be a univariate normally distributed random variable with mean 0
+        and variance $1/100$. What is the pdf of $X$?
+  \item What is the value of this pdf at 0?
+  \item What is the probability that $X = 0$?
+  \item Explain the discrepancy.
+\end{enumerate}
+\end{problem}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% PROBLEM 3 %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Conditioning and Bayes' rule}
+\begin{problem}
+  Let $\v \mu \in \R^m$ and
+  $\v \Sigma, \v \Sigma' \in \R^{m \times m}$.  Let $X$ be an
+  $m$-dimensional random vector with
+  $X \sim \mathcal{N}(\v \mu, \v \Sigma)$, and let $Y$ be a
+  $m$-dimensional random vector such that
+  $Y \given X \sim \mathcal{N}(X, \v \Sigma')$. Derive the
+  distribution and parameters for each of the following.
+
+\begin{enumerate}[label=(\alph*)]
+  \item The unconditional distribution of $Y$.
+
+  \item The joint distribution for the pair $(X,Y)$.
+
+\end{enumerate}
+
+Hints:
+\begin{itemize}
+\item You may use without proof (but they are good advanced exercises)
+  the closure properties of multivariate normal distributions. Why is
+  it helpful to know when a distribution is normal?
+\item Review Eve's and Adam's Laws, linearity properties of
+  expectation and variance, and Law of Total Covariance.
+
+\end{itemize}
+
+\end{problem}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% PROBLEM 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{I can Ei-gen}
+\begin{problem}
+    Let $\v X \in \R^{n \times m}$.
+    \begin{enumerate}[label=(\alph*)]
+        \item What is the relationship between the $n$ eigenvalues
+              of $\v X \v X^T$ and the $m$ eigenvalues of $\v X^T \v X$?
+        \item Suppose $\v X$ is square (i.e., $n=m$) and symmetric.
+              What does this tell you about the eigenvalues of $\v X$?
+              What are the eigenvalues of $\v X + \v I$, where $\v I$ is the identity matrix?
+        \item Suppose $\v X$ is square, symmetric, and invertible.
+			  What are the eigenvalues of $\v X^{-1}$?
+	\end{enumerate}
+	Hints:
+	\begin{itemize}
+		\item Make use of singular value decomposition and the properties
+			  of orthogonal matrices. Show your work.
+		\item Review and make use of (but do not derive) the spectral theorem.
+	\end{itemize}
+\end{problem}
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%% PROBLEM 5 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Vector Calculus}
+\begin{problem}
+  Let $\v x, \v y \in \R^m$ and $\v A \in \R^{m \times m}$. Please derive from
+  elementary scalar calculus the following useful properties. Write
+  your final answers in vector notation.
+\begin{enumerate}[label=(\alph*)]
+    \item What is the gradient with respect to $\v x$ of $\v x^T \v y$?
+    \item What is the gradient with respect to $\v x$ of $\v x^T \v x$?
+    \item What is the gradient with respect to $\v x$ of $\v x^T \v A \v x$?
+\end{enumerate}
+\end{problem}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% PROBLEM 7 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Gradient Check}
+\begin{problem}
+  Often after finishing an analytic derivation of a gradient, you will
+  need to implement it in code.  However, there may be mistakes -
+  either in the derivation or in the implementation. This is
+  particularly the case for gradients of multivariate functions.
+
+  \air
+
+  \noindent One way to check your work is to numerically estimate the gradient
+  and check it on a variety of inputs. For this problem we consider
+  the simplest case of a univariate function and its derivative.  For
+  example, consider a function $f(x): \mathbb{R} \to \mathbb{R}$:
+$$\frac{d f}{d x} = \underset{\epsilon \to 0} \lim \frac{f(x + \epsilon) - f(x - \epsilon)}{2 \epsilon}$$
+\noindent A common check is to evaluate the right-hand side for a small value of
+$\epsilon$, and check that the result is similar to your analytic
+result.\\
+
+\smallskip
+
+\noindent In this problem, you will implement the analytic and numerical derivatives of the function \[f(x) = \cos(x) + x^2 + e^x.\]
+
+\begin{enumerate}
+  \item Implement \texttt{f} in Python (feel free to use whatever \texttt{numpy} or \texttt{scipy} functions you need):
+  \begin{lstlisting}[language=python]
+  def f(x):
+
+  \end{lstlisting}
+  \item Analytically derive the derivative of that function, and implement it in Python:
+  \begin{lstlisting}[language=python]
+  def grad_f(x):
+
+  \end{lstlisting}
+  \item Now, implement a gradient check (the numerical approximation to the derivative), and by plotting, 
+        show that the numerical approximation approaches the analytic as \texttt{epsilon} 
+        $\to 0$ for a few values of $x$:
+  \begin{lstlisting}[language=python]
+  def grad_check(x, epsilon):
+
+  \end{lstlisting}
+\end{enumerate}
+\end{problem}
+
+\end{document}
