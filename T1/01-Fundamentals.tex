@@ -12,13 +12,14 @@
 
 % You don't need to change these.
 \course{CS281-F17}
-\assignment{Assignment \#1 v 1.0}
+\assignment{Assignment \#1 v 1.1}
 \duedate{11:59pm September 22, 2017}
 
 \usepackage{url, enumitem}
 \usepackage{amsfonts}
 \usepackage{listings}
 \usepackage{bm}
+\usepackage{hyperref}
 
 % Some useful macros.
 \newcommand{\given}{\,|\,}
@@ -110,8 +111,9 @@ linear and non-linear features in the predictions made by linear models.
 
 We will be working with the regression data set Protein
 Tertiary Structure:
-\url{https://archive.ics.uci.edu/ml/machine-learning-databases/00265/CASP.csv}.
-This data set contains information about predicted conformations for 45730
+\url{https://archive.ics.uci.edu/ml/machine-learning-databases/00265/}
+(download CASP.csv). This data set contains information about predicted 
+conformations for 45730
 proteins. In the data, the target variable $y$ is the root-mean-square
 deviation (RMSD) of the predicted conformations with respect to the true properly
 folded form of the protein. The RMSD is the measure of the average distance
