@@ -206,7 +206,7 @@ from torch.autograd import Variable
 weights = Variable(Tensor(size))
 
 # Initialize an optimizer of the weights
-optimizer = torch.optim.LBFGS(weights)
+optimizer = torch.optim.LBFGS([weights])
 
 ...
 \end{verbatim}
