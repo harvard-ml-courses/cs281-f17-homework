@@ -1,0 +1,22 @@
+\begin{problem}[Neural Networks, 5pts]
+    In the previous problem, we have implemented a Logistic Regression classifier using PyTorch.
+    Logistic Regression can be seen as a 1-layer neural network. With PyTorch automatic differentiation,
+    implementing a multi-layer neural network only requires incremental change to our logistic regression
+    implementation.
+
+    \begin{enumerate}[label=(\alph*)]
+        \item Implement a multi-layer neural network for IMDB classification and report accuracy
+              on the test set. You are free to design the network structure (number of hidden units,
+              activation function) and choose the optimization methods (SGD or ADAM, regularization 
+              or not, etc.).
+        \item (Optional) Implement sentiment classification based on Convolutional Neural Networks.
+              We recommend reading
+              \href{http://www.people.fas.harvard.edu/~yoonkim/data/sent-cnn.pdf}{Yoon Kim (2014)}
+              {\textit{Convolution Neural Networks for Sentence Classification}}.
+              Note that in this part, you need to treat the text as a sequence of word vectors instead of bag-of-words.
+              You can do this by forwarding \texttt{batch.text[0]} to 
+              \texttt{torch.nn.Embedding(vocab\_size, embedding\_dim)}
+              after setting the weights using the pretrained vectors from\\
+              \texttt{text\_field.vocab.vectors}.
+     \end{enumerate}
+\end{problem}

@@ -1,0 +1,33 @@
+\begin{problem}[Spherical Gaussian, 10pts]
+One intuitive way to summarize a probability density is via the mode,
+as this is the ``most likely'' value in some sense.  A common example
+of this is using the maximum \textit{a posteriori} (MAP) estimate of a
+model's parameters.  In high dimensions, however, the mode becomes
+less and less representative of typical samples.  Consider variates
+from a~$D$-dimensional zero mean spherical Gaussian with unit
+variance:
+\begin{align*}
+  \bx &\sim \distNorm(\bzero_D, \ident_D),
+\end{align*}
+where~$\bzero_D$ indicates a column vector of~$D$ zeros and~$\ident_D$
+is a~${D\times D}$ identity matrix.
+\begin{enumerate}
+  \item Compute the distribution that this implies over the distance
+    of these points from the origin.  That is, compute the
+    distribution over~$\sqrt{\bx^\trans\bx}$, if~$\bx$ is a
+    realization from~$\distNorm(\bzero_D, \ident_D)$.  (Note: Consider
+    transformations of a Gamma distribution described in Murphy 2.4.5.)
+  \item Make a plot that shows this probability density function for
+    several different values of~$D$, up to ~${D=100}$.
+
+  \item Make a plot of the cumulative distribution function (CDF) over
+    this distance distribution for~${D=100}$.  A closed-form solution
+    may be difficult to compute, so you can do this numerically.)
+
+  \item From examining the CDF we can think about where most of the
+    mass lives as a function of radius.  For example, most of the mass
+    for~${D=100}$ is within a thin spherical shell.  From eyeballing
+    the plot, what are the inner and outer radii for the shell that
+    contains 90\% of the mass in this case?
+\end{enumerate}
+\end{problem}

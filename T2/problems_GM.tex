@@ -1,0 +1,75 @@
+
+\begin{problem}[Directed Graphical and  Naive Bayes, 10pts]
+\textit{To draw the DGMs for this problem, we recommend using the \texttt{tikzbayesnet} library. For example the following is drawn in \LaTeX:}
+\begin{center}
+
+
+\begin{tikzpicture}
+  %Define nodes
+  \node[latent]                               (y) {$y$};
+  \node[latent, above=of y] (w) {$\mathbf{w}$};
+  \node[latent, above=of y]  (x) {$\mathbf{x}$};
+  \node[latent, right=2cm of y]            (t) {$\tau$};
+
+  % Connect the nodes
+  \edge {x,w,t} {y} ; %
+
+  % Plates
+  \plate {yx} {(x)(y)} {$N$} ;
+
+\end{tikzpicture}
+\end{center}
+
+
+\noindent  This problem focuses on modeling a joint distribution of random variables,
+$p(y, x_1, \ldots, x_V)$, consisting of discrete variables. These variables represent a class label $y
+\in \{1, \ldots, C\}$ and features $x_1 \ldots, x_V$
+each of each can take on a values $x_{v} \in \{0, 1\}$.
+
+
+\begin{enumerate}[label=(\alph*)]
+\item  Let $V = 4$. Use the chain rule to select any valid factorization of this joint distribution into univariate distributions. Draw the directed graphical model corresponding to this factorization.
+
+\item What is the sum of the sizes of the \textit{conditional probability tables} associated with
+this graphical model. Can you reduce the order of magnitude of this value with a different DGM?
+
+\item  Now consider a naive Bayes factorization of this model, given by,
+
+\[ p(y, x_1, \ldots, x_V ) \approx p(y) \prod_{v} p(x_v | y). \]
+
+Draw a directed graphical model for this factorization.
+What is the size of the conditional probability tables required to
+fully express any factored distribution of this form?
+
+\item In class, we parameterized naive Bayes such that the class
+  distribution is Categorical with a Dirichlet prior, and the
+  class-conditional distributions are Bernoulli with a Beta
+  prior. Extend the graphical model above to show the generative model
+  of $N$ data points and include the parameters and hyper-parameters
+  as random variables.
+
+
+\item Assuming the data obeys the naive Bayes assumptions, answer the following questions as true/false using your directed graphical model.  Justify your answer.
+
+      \begin{itemize}
+      \item For a given example, features $x_1$ and $x_2$ are independent.
+      \item The class labels $y$ are always conditionally independent of the class-conditional parameters.
+      \item Upon observing the class distribution parameters, the class labels are conditionally independent.
+      \item Upon observing the class distribution parameters, the features are conditionally independent.
+      \item Upon observing the class distribution hyper-parameters, the class labels are conditionally independent.
+      \end{itemize}
+
+
+    \item For the next problem, we will utilize naive Bayes for a
+      problem where each example has a \textit{bag} or multiset of
+      items. A bag is a set that may contain multiple instances of the
+      same value. One approach is to ignore this property and use
+      $x_v$ as an indicator function for each item type. An
+      alternative is to model $x_v$ with sample space
+      $\{0,\ldots, D\}$, where $D$ is the maximum times an item
+      appears and to use a Dirichlet-Categorical for the
+      class-conditional.  Give one benefit and one drawback of this
+      approach. Propose a third option for modeling this distribution.
+
+\end{enumerate}
+\end{problem}

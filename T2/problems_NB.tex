@@ -1,0 +1,79 @@
+\begin{problem}[Naive Bayes Implementation, 10pts]
+
+\noindent You will now implement a naive Bayes classifier for
+for sentiment classification. For this problem you will use
+the IMDB Movie Reviews dataset which consists of positive and negative movie reviews . Here are two example reviews:\\
+
+        \texttt{there is no story! the plot is hopeless! a filmed based on a car with a \\
+        \indent stuck accelerator, no brakes, and a stuck automatic transmission gear \\
+        \indent lever cannot be good! ...  i feel sorry for the actors ... poor script ... \\
+        \indent heavily over-dramatized ... this film was nothing but annoying, \\
+        \indent stay away from it!} [negative review] \\
+
+        \texttt{i had forgotten both how imaginative the images were, and how witty \\
+        \indent the movie ... anyone interested in politics or history will love the movie's \\
+        \indent offhand references - anyone interested in romance will be moved - this \\
+        \indent one is superb.} [positive review] \\
+
+      \noindent As noted in the last problem, it is common to think of
+      the input data as a bag/multiset. In text applications,
+      sentences are often represented as a \textit{bag-of-words},
+      containing how many times each word appears in the sentence. For
+      example, consider two sentences:
+\begin{itemize}
+\item \begin{verbatim}We like programming. We like food.\end{verbatim}
+\item \begin{verbatim}We like CS281.\end{verbatim}
+\end{itemize}
+A vocabulary is constructed based on these two sentences:
+\begin{verbatim}
+                 ["We", "like", "programming", "food", "CS281"]
+\end{verbatim}
+Then the two sentences are represented as the number of occurrences of each word in the vocabulary (starting from position 1):
+\begin{itemize}
+\item \begin{verbatim}[0, 2, 2, 1, 1, 0]\end{verbatim}
+\item \begin{verbatim}[0, 1, 1, 0, 0, 1]\end{verbatim}
+\end{itemize}
+
+\noindent We have included a utility file \texttt{utils.py} that does this mapping. For
+these problems you can therefore treat text in this matrix representation.
+
+
+\begin{itemize}
+
+	\item Implement a Naive Bayes classifier using a
+          Bernoulli class-conditional with a Beta prior
+          where each feature is an indicator that
+          a word appears at least once in the bag.
+
+    \item Implement a Naive Bayes classifier using a Categorical
+          class-conditional with a Dirichlet prior. Here
+          the features represent that count of each word in
+          the bag.
+
+
+
+    \item For both models, experiment with various settings
+          for the priors. For the Dirichlet prior on
+          the class, begin with $\boldsymbol{\alpha} = \v 1$
+          (Laplace Smoothing).
+          Do the same for the class-conditional prior
+          (be it Dirichlet or Beta). Keeping uniformity,
+          vary the magnitude to $.5$ and smaller. If the
+          classes are unbalanced in the dataset, does it help
+          to use a larger $\alpha$ for the less-often occuring
+          class? Optionally, choose class-conditional priors based on an
+          outside text source. Validate your choices on the validation set,
+          and report accuracy on the test set.
+
+      \item (Optional) With the bag-of-words representation, 
+             would the model be able to capture phrases
+             like ``don't like''? An alternative to the bag-of-words model is
+          known as the bag-of-bigrams model, where a bigram is two
+          consecutive words in a sentence.  Modify \texttt{utils.py}
+          to include bigram features with either model and see if they
+          increase accuracy.
+
+    \item (Optional Reading) \textit{Baselines and Bigrams: Simple, Good Sentiment and Topic Classification}\\
+    \url{http://www.aclweb.org/anthology/P/P12/P12-2.pdf#page=118}\\
+\end{itemize}
+\end{problem}

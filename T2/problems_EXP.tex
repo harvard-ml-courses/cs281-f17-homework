@@ -1,0 +1,61 @@
+\begin{problem}[Hurdle Models for Count Data, 10pts]
+
+  In this problem we consider predictive models of count data. For
+  instance given information about the student $x$, can we predict how
+  often they went to the gym that week $y$? A natural choice is to use a Poisson GLM
+  i.e. $y$ conditioned on $x$ is modeled as a Poisson distribution.
+
+  However, in practice, it is common for count data of this form to
+  follow a bi-modal distribution over count data. For instance, our
+  data may come from a survey asking students how often they went to
+  the gym in the past week. Some would do so frequently, some would do
+  it occasionally but not in the past week (a random zero), and a
+  substantial percentage would never do so.
+
+  When modeling this count data with generalized linear models, we
+  may observe more zero examples than expected from our model.
+  In the case of a Poisson, the mode of the distribution is the
+  integer part of the mean. A Poisson GLM may therefore be inadequate
+  when means can be relatively large but the mode of the output is 0. Such data is
+  common when many data entries have 0 outputs and many also have much
+  larger outputs, so the mode of output is 0 but the overall mean is
+  not near 0. This problem is known as \textit{zero-inflation}.
+
+  This problem considers handling zero-inflation with a two-part model called
+  a \textit{hurdle model}. One part is a binary model such as a logistic model
+  for whether the output is zero or positive. Conditional on a positive output,
+  the ``hurdle is crossed'' and the second part uses a truncated model that
+  modifies an ordinary distribution by conditioning on a positive
+  output. This model can handle both zero inflation and zero
+  deflation.
+
+  Suppose that the first part of the process is governed by
+  probabilities $p(y > 0\ |\ x) = \pi $ and $p(y = 0\ | \ x) = 1 - \pi$; and the second part
+  depends on  $\{y\in \mathbb{Z} \ |\ y > 0\}$ and follows a probability mass
+  function $f(y\ |\ \mathbf{x})$ that is truncated-at-zero. The
+  complete distribution is therefore:
+\begin{align*}
+P(y = 0\ |\ x) & = 1- \pi\\
+P(y = j\ |\ x) & = \pi \frac{f(j\ |\ \mathbf{x})}{1 - f(0\ | \ \mathbf{x})},\ j=1,2,...
+\end{align*}
+One choice of parameterization is to use a logistic regression model
+for $\pi$: $$\pi = \sigma(\mathbf{x}^\top \mathbf{w}_1)$$ and use a Poisson GLM for $f$ with mean parameters $\lambda$ (see
+Murphy 9.3): $$\lambda = \exp(\mathbf{x}^\top \mathbf{w}_2) $$
+
+\begin{enumerate}[label=(\alph*)]
+\item Suppose we observe $N$ data samples $\{(x_n, y_n)\}_{n=1}^N$.  Write down the log-likelihood for the hurdle model assuming an unspecified mass function $f$.
+Give an maximum likelihood estimation approach for the specified parts of the model.
+
+\item Assume now that we select Poisson distribution for $f$. Show
+  that the truncated-at-zero Poisson distribution (as used in the
+  hurdle model) is a member of the exponential family.  Give its the
+  sufficient statistics, natural parameters and log-partition
+  function.
+
+\item What is the mean and variance of a truncated Poisson model with mean parameter $\lambda$? If we observe $n$ i.i.d. samples from a truncated Poisson distribution, what is the maximum likelihood estimate of $\lambda$? (Note: Give an equation which could be solved numerically to obtain the MLE. )
+
+\item  Now assume that we using a hurdle model as a GLM with $f$ as a Poisson distribution. Show that
+  this is a valid GLM (exponential family for $y$), derive its log-likelihood, and give its sufficient statistics.
+
+\end{enumerate}
+\end{problem}

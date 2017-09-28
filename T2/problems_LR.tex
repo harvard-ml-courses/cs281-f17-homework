@@ -1,0 +1,45 @@
+\begin{problem}[Logistic Regression with Autograd, 15pts]
+
+  In the previous problem, you implemented a Naive Bayes classifier
+  for sentiment classification on the IMDB Movie Reviews dataset.  In this
+  problem, you will apply logistic regression to the same task.
+
+\begin{enumerate}[label=(\alph*)]
+
+    \item $\ell_1$-regularized logistic regression. Consider a model parameterized by $\mathbf{w}$:
+    \begin{align*}
+        p(\mathbf{w}) & = \frac{1}{2b}\exp(-\frac{\|\mathbf{w}\|_1}{b}) \\
+    p(y = 1 | \mathbf{x}, \mathbf{w}) & = \sigma(\mathbf{w}^\top \mathbf{x})\\
+    p(y = 0 | \mathbf{x}, \mathbf{w}) & = 1 - \sigma (\mathbf{w}^\top \mathbf{x})
+    \end{align*}
+    where $\sigma(\cdot)$ is the
+    sigmoid
+      function. Note that we are imposing a Laplacian prior on
+    $\mathbf{w}$, see Murphy, 2.4.4.
+
+        \begin{enumerate}[label=(\roman*)]
+             \item Given a dataset $\{(\mathbf{x}^{(i)},y^{(i)})\}_{i=1}^N$, derive the necessary gradient updates for MAP of $\mathbf{w}$.\footnote{You only need to consider the case where $\forall i, w_i\neq 0$. If $\exists i, w_i=0$, we can use its \href{https://see.stanford.edu/materials/lsocoee364b/01-subgradients_notes.pdf}{subgradients} instead.}
+             \item Show that for some constant $\lambda$, MAP inference of $\mathbf{w}$ is equivalent to minimizing
+                 \begin{equation*}
+                     - \frac{1}{N} \sum_{i=1}^N \log p(y^{(i)}|\mathbf{x}^{(i)},
+                     \mathbf{w}) + \lambda \|\mathbf{w}\|_1
+                 \end{equation*}
+         \end{enumerate}
+
+    \item Implementation using PyTorch automatic differentiation.\footnote{\url{https://github.com/harvard-ml-courses/cs281/blob/master/cs281-f17/sections/04/walkthrough.ipynb}.}
+        \begin{enumerate}[label=(\roman*)]
+             \item
+               Using the bag-of-words feature representation from the previous question, train a logistic regression model using PyTorch autograd and \href{http://pytorch.org/tutorials/beginner/examples_nn/two_layer_net_nn.html}{\texttt{torch.nn}}. Report test accuracy.
+                 Select regularization strength $\lambda$ based on validation accuracy.
+             \item Which 5 words correspond to the largest weight indices, per class, in the
+                   learnt weight vectors? Which 5 words correspond to the least weight
+                   indices?
+             \item Study how sparsity (i.e percentage of zero elements in a vector)
+                 of the parameter vector changes with different values of $\lambda$.
+                 Again, tune $\lambda$ on the validation set and report the test accuracies
+                 on the test set. Suggested values to try are $\{0,0.001,0.01,0.1,1\}$. You can treat parameters with $<1e-4$ absolute values as zeros.
+         \end{enumerate}
+
+\end{enumerate}
+
+\end{problem}
