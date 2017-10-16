@@ -28,7 +28,7 @@ from collections import Counter
 #  train_iter.init_epoch() needs to be called before starting next epoch
 # -val_iter: An iterator for validation examples.
 # -test_iter: An iterator for test examples.
-# -text_field: A field object, text_field.vocab is the vocabulary. If load_text is False, this would be None.
+# -text_field (when load_text is True): A field object, text_field.vocab is the vocabulary. 
 #
 #### Note:
 # batch.ratings are ratings, can be 1, 2, 3, 4 or 5.
