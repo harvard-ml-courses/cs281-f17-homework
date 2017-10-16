@@ -242,6 +242,9 @@ Warning: most of the jokes are bad, tasteless, or both. At best, they were
 funny to late-night TV hosts in 1999-2000. Note also that some of the jokes do
 not have any ratings and so can be ignored.
 
+\textbf{Update: If you are having memory issues with this problem. Please see the note in the
+readme.}
+
 \begin{enumerate}[label=(\alph*)]
 \item
 Let~${r_{i,j}\in\{1,2,3,4,5\}}$ be the rating of user $i$ on joke $j$.  A latent linear model introduces a vector ${u_i\in\R^K}$ for each user and a vector~${v_j\in\R^K}$ for each joke.  Then, each rating is modeled as a noisy version of the appropriate inner product. Specifically,
@@ -293,6 +296,10 @@ resonable priors and write the graphical model.
 
 \section*{Ordinal Regression}
 
+\textbf{Update: If you are running into memory issues with this problem. Please see the note in the
+readme.}
+
+
 We now address the problem of predicting joke ratings given the text of the
 joke. The previous models assumed that the ratings where continuous real
 numbers, while they are actually integers from 1 to 5. To take this into
@@ -300,12 +307,12 @@ account, we will use an ordinal regression model.
 Let the rating values
 be $r = 1,\ldots,R$. In the ordinal regression model the real line is
 partitioned into $R$ contiguous intervals with boundaries
-{\color{red}
+
 \begin{align}
 b_1 < b_2 < \ldots < b_{R+1} = +\infty\,,
 \end{align}
-}
-such that the interval $[b_r,b_{r+1})$ corresponds to the $r$-th rating value.
+
+\noindent such that the interval $[b_r,b_{r+1})$ corresponds to the $r$-th rating value.
 We will assume that $b_1 = -4$, $b_2 = -2$, $b_3 = 0$, $b_4 = 2$ and $b_5 = 4$.
 Instead of directly modeling the ratings, we will be modeling them in terms of a
 hidden variable $f$. We have that the rating $y$ is observed
@@ -346,7 +353,9 @@ $p(\mathbf{w})=\mathcal{N}(\bm 0, \mathbf{I})$.
 
 \vspace{0.5cm }
 \noindent
-\textit{Computational Note for this Problem:} You may need the following numerical trick.
+Computational Note for this Problem: \textbf{You will need the following numerical trick,
+which is implemented as \textit{log\_difference} in utils.}
+
 If $a > b $ but $a-b$ is close to 0, you can compute $\log(a-b)$
 instead as:
 
@@ -356,16 +365,15 @@ instead as:
 is always smaller than 1 and larger than 0. Therefore,
 $\log(1 - \exp(b - a))$ is always well defined.
 
-{\color{red}
-An alternative way to compute $\log(a-b)$ is by computing $\log((1-b)-(1-a))$:
+% An alternative way to compute $\log(a-b)$ is by computing $\log((1-b)-(1-a))$:
 
-\[\log(1 - \exp(\log (1-a) - \log (1-b)))+\log (1-b) \]
+% \[\log(1 - \exp(\log (1-a) - \log (1-b)))+\log (1-b) \]
 
-If $a\to b, b\to 0$, then the first method is more numerically stable; if $a\to b, b\to 1$, then the
-second method is more numerically stable. Therefore, a more numerically stable way of calculating $\log(a-b)$ is:
+% If $a\to b, b\to 0$, then the first method is more numerically stable; if $a\to b, b\to 1$, then the
+% second method is more numerically stable. Therefore, a more numerically stable way of calculating $\log(a-b)$ is:
 
-\[\text{torch.max}\left(\log(1-\exp(\log b-\log a))+\log a, \log(1 - \exp(\log (1-a) - \log (1-b)))+\log (1-b) \right)\]
-}
+% \[\text{torch.max}\left(\log(1-\exp(\log b-\log a))+\log a, \log(1 - \exp(\log (1-a) - \log (1-b)))+\log (1-b) \right)\]
+
 
 \begin{problem}[Ordinal linear regression 25pts]
 \begin{enumerate}
