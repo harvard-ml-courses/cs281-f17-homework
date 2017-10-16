@@ -9,15 +9,18 @@ random.seed(1234)
 from collections import Counter
 # Load jester dataset, tested on Python 2.7
 #### Arguments
+# -load_text: Load text or not. In problem 2, text is unnecessary hence this flag should be
+#             set to False to save memory. Default True.
 # -batch_size: batch size. Default 1.
+# -subsample_rate: Change this to 0.2 in problem 3 and use default 1.0 in problem 2. Default: 1.0
 # -repeat: Whether to repeat the iterator for multiple epochs. If set to False, 
-#  then .init_epoch() needs to be called before starting next epoch. Default False.
+#          then .init_epoch() needs to be called before starting next epoch. Default False.
 # -shuffle: Whether to shuffle examples between epochs.
 # -ratings_path: The path to user, joke, rating file.
 # -jokes_path: The path to jokes file 
-# -subsample_rate: If full training takes 
-#                  too much time/memory, the full dataset can be subsampled
-#                  to reduce the memory footprint. Default: 1.0
+# -max_vocab_size: Only the most max_vocab_size frequent words would be kept. We use 
+#                  this to reduce memory footprint and the number of model parameters. Default: 150.
+# -gpu: Use GPU or not. Default False.
 #
 #### Returns
 # -train_iter: An iterator for training examples. You can call "for batch in train_iter"
@@ -25,7 +28,7 @@ from collections import Counter
 #  train_iter.init_epoch() needs to be called before starting next epoch
 # -val_iter: An iterator for validation examples.
 # -test_iter: An iterator for test examples.
-# -text_field: A field object, text_field.vocab is the vocabulary
+# -text_field: A field object, text_field.vocab is the vocabulary. If load_text is False, this would be None.
 #
 #### Note:
 # batch.ratings are ratings, can be 1, 2, 3, 4 or 5.
@@ -33,7 +36,7 @@ from collections import Counter
 # batch.jokes are joke ids, ranging from 1 to 63978.
 #
 #### Example 1:
-# train_iter, val_iter, test_iter, text_field = load_jester(batch_size=100, subsample_rate=1.0)
+# train_iter, val_iter, test_iter, text_field = load_jester(batch_size=100, subsample_rate=1.0, load_text=True)
 # V = len(text_field.vocab) # vocab size
 # for epoch in range(num_epochs):
 #     train_iter.init_epoch()
@@ -60,8 +63,8 @@ class Example(data.Example):
                 setattr(ex, name, field.preprocess(val))
         return ex
 
-def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.clean.dat.gz', batch_size=1, gpu=False,
-        repeat=False, shuffle=True, subsample_rate=1.0, max_vocab_size=999999):
+def load_jester(load_text=True, batch_size=1, subsample_rate=1.0, repeat=False, shuffle=True,
+        ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.clean.dat.gz', max_vocab_size=150, gpu=False):
     DEV = 0 if gpu else -1
     assert os.path.exists(jokes_path), "jokes file %s does not exist!"%jokes_path
     assert os.path.exists(ratings_path), "ratings file %s does not exist!"%ratings_path
@@ -69,10 +72,10 @@ def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.c
     rating_field = data.Field(sequential=False, use_vocab=False)
     user_field = data.Field(sequential=False, use_vocab=False)
     joke_field = data.Field(sequential=False, use_vocab=False)
-    #rating_field = data.Field(sequential=False, use_vocab=False, unk_token=None, pad_token=None)
-    #user_field = data.Field(sequential=False, use_vocab=False, unk_token=None, pad_token=None)
-    #joke_field = data.Field(sequential=False, use_vocab=False, unk_token=None, pad_token=None)
-    fields = [('text', text_field), ('ratings', rating_field), ('users', user_field), ('jokes', joke_field)]
+    if load_text:
+        fields = [('text', text_field), ('ratings', rating_field), ('users', user_field), ('jokes', joke_field)]
+    else:
+        fields = [('ratings', rating_field), ('users', user_field), ('jokes', joke_field)]
     jokes_text = {}
     joke = -1
     all_tokens = []
@@ -95,9 +98,8 @@ def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.c
 
     print ('Loading Data, this might take several minutes')
     if subsample_rate < 1.0:
-        print ('Warning: subsample rate set to %f < 1.0. This might hurt performance since training set size is reduced'%subsample_rate)
-    else:
-        print ('For debugging, you can consider setting subsample_rate to a smaller value to use a subsampled dataset')
+        print ('Subsampling rate set to %f'%subsample_rate)
+
     train, val, test = [], [], []
     with gzip.open(ratings_path) as f:
         for i, l in enumerate(f):
@@ -107,19 +109,20 @@ def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.c
             user = int(user)
             joke = int(joke)
             rating = int(rating)
-            assert joke in jokes_text
-            example = Example.fromlist([' '.join([item for item in jokes_text[joke].split() if item in most_common]), rating, user, joke], fields)
+            if load_text:
+                assert joke in jokes_text
+                example = Example.fromlist([' '.join([item for item in jokes_text[joke].split() if item in most_common]), rating, user, joke], fields)
+            else:
+                example = Example.fromlist([rating, user, joke], fields)
             p = random.random()
             q = random.random()
             if p < 0.98:
                 if q < subsample_rate:
                     train.append(example)
             elif p < 0.99:
-                if q < subsample_rate:
-                    val.append(example)
+                val.append(example)
             elif p < 1.0:
-                if q < subsample_rate:
-                    test.append(example)
+                test.append(example)
         train = data.Dataset(train, fields)
         val = data.Dataset(val, fields)
         test = data.Dataset(test, fields)
@@ -127,16 +130,17 @@ def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.c
             (train, val, test), 
             batch_size=batch_size, device=DEV, repeat=repeat,
             shuffle=shuffle)
-        train_iter.sort_key = lambda p: len(p.text)
-        val_iter.sort_key = lambda p: len(p.text)
-        test_iter.sort_key = lambda p: len(p.text)
+        train_iter.sort_key = lambda p: len(p.text) if hasattr(p, 'text') else 0
+        val_iter.sort_key = lambda p: len(p.text) if hasattr(p, 'text') else 0
+        test_iter.sort_key = lambda p: len(p.text) if hasattr(p, 'text') else 0
 
-    text_field.build_vocab(train)
-    #rating_field.build_vocab(train)
-    #user_field.build_vocab(train)
-    #joke_field.build_vocab(train)
     print ('Data Loaded')
-    return train_iter, val_iter, test_iter, text_field
+
+    if load_text:
+        text_field.build_vocab(train)
+        return train_iter, val_iter, test_iter, text_field
+    else:
+        return train_iter, val_iter, test_iter,
 
 
 # PyTorch function for calcuating log \phi(x)
@@ -155,10 +159,8 @@ class NormLogCDF(torch.autograd.Function):
         backward pass using the save_for_backward method.
         """
         input_numpy = input.numpy()
-        #print (input_numpy)
         output = torch.Tensor(norm.logcdf(input_numpy))
         self.save_for_backward(input)
-        #print (output)
         return output
 
     def backward(self, grad_output):
@@ -178,3 +180,21 @@ class NormLogCDF(torch.autograd.Function):
         # set nans to 0
         grad_input[grad_input!=grad_input] = 0
         return grad_input
+
+# PyTorch function for calculating log (\phi(x) - \phi(y)) where \phi is the normal distribution cdf
+#### Arguments
+# -x: a PyTorch Variable of size (batch_size).
+# -y: a PyTorch Variable of size (batch_size). x[i] should be always greater than y[i].
+#### Returns
+# log (phi (x) - \phi(y))
+def log_difference(x, y):
+    # calculate by using p1 and p2
+    logp1 = NormLogCDF()(x)
+    logp2 = NormLogCDF()(y)
+    logp = logp1 + torch.log(1 - torch.exp(logp2-logp1))
+    # calculate by using 1-p1 and 1-p2
+    log1_p1 = NormLogCDF()(-x)
+    log1_p2 = NormLogCDF()(-y)
+    logp_ = log1_p2 + torch.log(1 - torch.exp(log1_p1-log1_p2))
+    return torch.max(logp, logp_)
+
