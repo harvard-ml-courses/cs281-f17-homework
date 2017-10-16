@@ -354,6 +354,16 @@ instead as:
 is always smaller than 1 and larger than 0. Therefore,
 $\log(1 - \exp(b - a))$ is always well defined.
 
+{\color{red}
+An alternative way to compute $\log(a-b)$ is by computing $\log((1-b)-(1-a))$:
+
+\[\log(1 - \exp(\log (1-a) - \log (1-b)))+\log (1-b) \]
+
+If $a\to b, b\to 0$, then the first method is more numerically stable; if $a\to b, b\to 1$, then the
+second method is more numerically stable. Therefore, a more numerically stable way of calculating $\log(a-b)$ is:
+
+\[\text{torch.max}\left(\log(1-\exp(\log b-\log a))+\log a, \log(1 - \exp(\log (1-a) - \log (1-b)))+\log (1-b) \right)\]
+}
 
 \begin{problem}[Ordinal linear regression 25pts]
 \begin{enumerate}

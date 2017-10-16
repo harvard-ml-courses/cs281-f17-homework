@@ -6,7 +6,7 @@ from torchtext import data, datasets, vocab
 from scipy.stats import norm
 import numpy as np
 random.seed(1234)
-
+from collections import Counter
 # Load jester dataset, tested on Python 2.7
 #### Arguments
 # -batch_size: batch size. Default 1.
@@ -15,6 +15,9 @@ random.seed(1234)
 # -shuffle: Whether to shuffle examples between epochs.
 # -ratings_path: The path to user, joke, rating file.
 # -jokes_path: The path to jokes file 
+# -subsample_rate: If full training takes 
+#                  too much time/memory, the full dataset can be subsampled
+#                  to reduce the memory footprint. Default: 1.0
 #
 #### Returns
 # -train_iter: An iterator for training examples. You can call "for batch in train_iter"
@@ -26,11 +29,11 @@ random.seed(1234)
 #
 #### Note:
 # batch.ratings are ratings, can be 1, 2, 3, 4 or 5.
-# batch.users are user ids, starting from 1.
-# batch.jokes are joke ids, starting from 1.
+# batch.users are user ids, ranging from 1 to 150.
+# batch.jokes are joke ids, ranging from 1 to 63978.
 #
 #### Example 1:
-# train_iter, val_iter, test_iter, text_field = load_jester(batch_size=100)
+# train_iter, val_iter, test_iter, text_field = load_jester(batch_size=100, subsample_rate=1.0)
 # V = len(text_field.vocab) # vocab size
 # for epoch in range(num_epochs):
 #     train_iter.init_epoch()
@@ -58,7 +61,7 @@ class Example(data.Example):
         return ex
 
 def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.clean.dat.gz', batch_size=1, gpu=False,
-        repeat=False, shuffle=True):
+        repeat=False, shuffle=True, subsample_rate=1.0, max_vocab_size=999999):
     DEV = 0 if gpu else -1
     assert os.path.exists(jokes_path), "jokes file %s does not exist!"%jokes_path
     assert os.path.exists(ratings_path), "ratings file %s does not exist!"%ratings_path
@@ -72,6 +75,7 @@ def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.c
     fields = [('text', text_field), ('ratings', rating_field), ('users', user_field), ('jokes', joke_field)]
     jokes_text = {}
     joke = -1
+    all_tokens = []
     with gzip.open(jokes_path) as f:
         for i, line in enumerate(f):
             l = line.decode('utf-8')
@@ -81,31 +85,41 @@ def load_jester(ratings_path='jester_ratings.dat.gz', jokes_path='jester_items.c
                 joke = int(l.strip().strip(':'))
             else:
                 joke_text = l.strip()
+                tokens = l.strip().split()
+                all_tokens.extend(tokens)
                 jokes_text[joke] = joke_text
-    jokes = list(jokes_text.keys())
-    random.shuffle(jokes)
-    jokes_train = set(jokes[:100])
-    jokes_val = set(jokes[100:125])
-    jokes_test = set(jokes[125:])
+    counts = Counter(all_tokens)
+    most_common = counts.most_common(max_vocab_size)
+    most_common = set([item[0] for item in most_common])
+
 
     print ('Loading Data, this might take several minutes')
+    if subsample_rate < 1.0:
+        print ('Warning: subsample rate set to %f < 1.0. This might hurt performance since training set size is reduced'%subsample_rate)
+    else:
+        print ('For debugging, you can consider setting subsample_rate to a smaller value to use a subsampled dataset')
     train, val, test = [], [], []
     with gzip.open(ratings_path) as f:
         for i, l in enumerate(f):
-            if i % 1000 == 0:
+            if i % 100000 == 0:
                 print ('%d lines read'%i)
             user, joke, rating = l.split()
             user = int(user)
             joke = int(joke)
             rating = int(rating)
             assert joke in jokes_text
-            example = Example.fromlist([jokes_text[joke], rating, user, joke], fields)
-            if joke in jokes_train:
-                train.append(example)
-            elif joke in jokes_val:
-                val.append(example)
-            elif joke in jokes_test:
-                test.append(example)
+            example = Example.fromlist([' '.join([item for item in jokes_text[joke].split() if item in most_common]), rating, user, joke], fields)
+            p = random.random()
+            q = random.random()
+            if p < 0.98:
+                if q < subsample_rate:
+                    train.append(example)
+            elif p < 0.99:
+                if q < subsample_rate:
+                    val.append(example)
+            elif p < 1.0:
+                if q < subsample_rate:
+                    test.append(example)
         train = data.Dataset(train, fields)
         val = data.Dataset(val, fields)
         test = data.Dataset(test, fields)
