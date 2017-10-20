@@ -32,8 +32,8 @@ from collections import Counter
 #
 #### Note:
 # batch.ratings are ratings, can be 1, 2, 3, 4 or 5.
-# batch.users are user ids, ranging from 1 to 150.
-# batch.jokes are joke ids, ranging from 1 to 63978.
+# batch.users are user ids, ranging from 1 to 63978.
+# batch.jokes are joke ids, ranging from 1 to 150.
 #
 #### Example 1:
 # train_iter, val_iter, test_iter, text_field = load_jester(batch_size=100, subsample_rate=1.0, load_text=True)
