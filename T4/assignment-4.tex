@@ -1,0 +1,264 @@
+\documentclass{harvardml}
+
+
+\usepackage{url}
+
+% Put in your full name and email address.
+\name{Your Name}
+\email{email@fas.harvard.edu}
+
+% List any people you worked with.
+\collaborators{%
+  John Doe,
+  Fred Doe
+}
+
+\course{CS281-F17}
+\assignment{Assignment \#4}
+\duedate{Monday 5:00pm,  \\ November 13, 2017}
+
+
+% Useful macros
+\newcommand{\bw}{\boldsymbol{w}}
+\newcommand{\distNorm}{\mathcal{N}}
+\newcommand{\given}{\,|\,}
+\newcommand{\ident}{\mathbb{I}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\bz}{\boldsymbol{z}}
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{bayesnet}
+
+% Some useful macros.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\var}{\text{var}}
+\newcommand{\cov}{\text{cov}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\ep}{\varepsilon}
+
+\theoremstyle{plain}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+
+\section*{Graphical Models for Denoising}
+
+We have seen several variants of the grid-structured Ising model where
+we have a binary-valued variable at each position of a grid.  Here we
+consider the grid Potts model which has the same graphical model
+structure, but instead with multiple labels $K$ at each node of the
+undirected graph $y_{i,j} \in \{1, \ldots, K\}$.
+
+\begin{center}
+
+
+\begin{tikzpicture}
+\matrix [row sep=0.5cm, column sep=0.5cm] {
+\node(a)[latent]{$y_{1,1}$}; & \node(d)[latent]{$y_{1,2}$}; & \node(g)[latent]{$y_{1,3}$}; & \\
+\node(b)[latent]{$y_{2,1}$}; & \node(e)[latent]{$y_{2,2}$}; & \node(h)[latent]{$y_{2,3}$}; & \\
+\node(c)[latent]{$y_{3,1}$}; & \node(f)[latent]{$y_{3,2}$}; & \node(i)[latent]{$y_{3,3}$}; & \\
+};
+\draw(a) -- (b)--(c);
+\draw(d) -- (e) --(f);
+\draw(g) -- (h) --(i);
+\draw(a) -- (d)--(g);
+\draw(b) -- (e)--(h);
+\draw(c) -- (f)--(i);
+\end{tikzpicture}
+\end{center}
+
+\noindent In particular consider a conditional Potts model for image denoising.
+The input $x$ will consist of a picture with pixels $x_{ij}$, where each
+pixel is one of $K$ different colors and has been perturbed by random
+noise. Each random variable $y_{ij}$ represents the color we think
+each pixel should take after denoising. Unary potentials represent the
+prior belief for that pixel based on its observed value. Neighbor
+potentials enforce smoothness of the labeling. Specifically,
+$\theta(y_{ij}=k) = 10 * \delta(x_{ij}=k)$, and for all neighboring
+pixels $n \in \{(i-1, j), (i+1, j), (i, j-1), (i, j+1)\}$,
+\[\theta(y_{i,j}, y_n) =
+\begin{cases}
+  10 & y_{i,j} = y_n \\
+  2 & |y_{i,j} - y_n| = 1 \\
+  0 & o.w.
+\end{cases}
+\]
+
+\noindent This is obviously a simplified and discretized view of the true denoising problem,
+but it gives us a reasonable place to start. As an example consider the problem with $K=2$
+and noise over the image of a spiral.
+
+\begin{center}
+  \includegraphics[width=6cm]{spiral}
+\end{center}
+
+
+
+\newpage
+
+\begin{problem}[Variational Inference for Denoising, 30pts]
+
+\noindent For the problems below we have provided a set of example images in
+the form of numpy arrays including a small sample, a flag, a bullseye,
+and the large spiral above.
+
+\begin{enumerate}
+
+
+\item First as a sanity check, consider  the 3x3 image small with $K=2$. Compute using brute-force the
+  true marginal probability $p(y_{i,j})$ of any node.
+
+\item Now consider a variational-inference based approach to this
+  problem. Using mean-field factorization, with $q(y)$ factored to
+each node of the graph, derive local mean field updates.
+
+\begin{center}
+\begin{tikzpicture}
+\matrix [row sep=0.5cm, column sep=0.5cm] {
+\node(a)[latent]{$q_{1,1}$}; & \node(d)[latent]{$q_{1,2}$}; & \node(g)[latent]{$q_{1,3}$}; & \\
+\node(b)[latent]{$q_{2,1}$}; & \node(e)[latent]{$q_{2,2}$}; & \node(h)[latent]{$q_{2,3}$}; & \\
+\node(c)[latent]{$q_{3,1}$}; & \node(f)[latent]{$q_{3,2}$}; & \node(i)[latent]{$q_{3,3}$}; & \\
+};
+\end{tikzpicture}
+\end{center}
+
+
+\item Implement these mean-field updates with a non-synchronous
+  schedule in PyTorch/numpy. Run for 30 epochs starting with $q$ set
+  to a uniform distribution. Graph the results on the small images and
+  compare to the brute-force approach. Compare the variational values
+  to the exact marginals for the small example. Note: running on the
+  spiral example will likely require a fast/matrix implementation.
+
+\item Implement Loopy Belief Propagation with a non-synchronous
+  schedule in PyTorch/numpy following the algorithm given in
+  Murphy. Run for 30 epochs starting with $q$ set to a uniform
+  distribution. Compare to the mean field approach.
+
+\item Write out the Integer Linear Programming formulation for the
+  maximum assignment problem.  What is the advantage of mean field
+  compared to the ILP approach?
+
+\item (Optional) Install the PuLP toolkit in python. Implement the ILP
+  formulation for this problem. Compare your solution for the smaller
+  images.
+
+\end{enumerate}
+\end{problem}
+
+\newpage
+
+\section*{Modeling users and jokes with a Bayesian latent bilinear model}
+
+The next two questions will develop Bayesian inference methods for the simplest version of the latent bilinear model you used to model jokes ratings in HW3. The data set we'll use is the same as in HW3, a modified and preprocessed variant of the Jester data set. However, to make things easier (and to make being Bayesian more worthwhile) {\bf we'll only use subsampling to 10\% of the training data}.  The other ratings will form your test set.
+
+\subsection*{The model}
+
+The model is the same as in HW3, but with Gaussian priors on the latent parameter matrices $U$ and $V$. Let~${r_{i,j}\in\{1,2,3,4,5\}}$ be the rating of user $i$ on joke $j$.  A latent linear model introduces a vector ${u_i\in\R^K}$ for each user and a vector~${v_j\in\R^K}$ for each joke.  Then, each rating is modeled as a noisy version of the appropriate inner product. Specifically,
+\[
+r_{i,j} \sim \mathcal{N}(u_i^T v_j, \sigma_\epsilon^2).
+\]
+Fix $\sigma_\epsilon^2$ to be 1.0, and start with $K = 2$. We put independent Gaussian priors on each element of $U$ and $V$:
+\[U_{i,k} \sim \mathcal{N}(0, \sigma_U^2=5)\]
+\[V_{i,k} \sim \mathcal{N}(0, \sigma_V^2=5)\]
+
+
+
+\begin{problem}[Stochastic Variational Inference, 30pts]
+
+Recall that variational inference optimizes a lower bound on the log marginal likelihood (integrating out parameters $\theta$), like so:
+\begin{align}
+\log p(x) & = \log \int p(x, \theta) d\theta = \log \int p(x|\theta) p(\theta) d\theta \\
+& = \log \int \frac{q_\lambda(\theta)}{q_\lambda(\theta)} p(x|\theta) p(\theta) d\theta
+  = \log \mathbb{E}_{q_\lambda} \frac{1}{q(\theta)} p(x|\theta) p(\theta) d\theta \\
+& \geq \mathbb{E}_{q_\lambda} \log \left[ \frac{1}{q_\lambda(\theta)} p(x|\theta) p(\theta) \right]
+ = \underbrace{-\mathbb{E}_{q_\lambda} \log q_\lambda(\theta)}_{\textnormal{entropy}}  + \underbrace{\mathbb{E}_{q_\lambda} \log p(\theta)}_{\textnormal{prior}} + \underbrace{\mathbb{E}_{q_\lambda} \log p(x|\theta)}_{\textnormal{likelihood}}
+= \mathcal{L}(\lambda)
+\end{align}
+%
+In this case, $\theta = U,V$ and $x = R$:
+%
+\begin{align}
+\mathcal{L}(\lambda) = -\mathbb{E}_{q_\lambda} \log q_\lambda(U, V) + \mathbb{E}_{q_\lambda} \log p(U, V) + \sum_{n=1}^N \mathbb{E}_{q_\lambda} \log p(r_n | U, V)
+\end{align}
+%
+
+\noindent This is a general formula that works for many different priors, likelihoods and variational approximations. 
+Here we will keep things simple and choose $q(U,V)$ to be a Gaussian factorized over every single entry of each matrix for $U$ and $V$, e.g. the same form as the prior.
+Thus our variational parameters will consist of a mean and variance for each entry in U and V: $\lambda^{(\mu U)}_{ik}$, $\lambda^{(\sigma^2 U)}_{ik}$, $\lambda^{(\mu V)}_{jk}$, 
+and $\lambda^{(\sigma^2 V)}_{jk}$.
+
+\begin{enumerate}
+
+\item Derive the expression for the $KL$ divergence between two univariate Gaussians.
+
+\item Exploiting the conditional independence of the model, we can write the variational loss as:
+\[ {\cal L}(\lambda) = -KL(q_\lambda(U)\ ||\  p(U) ) - KL(q_\lambda(V)\ ||\ p(V)) + \sum_{n=1}^N \mathbb{E}_{q_\lambda} \log p(r_n | U, V)\]
+
+Simplify the first two terms of this model to get a closed form expression.
+
+
+\item The third term is the likelihood of the data under an expectation wrt the variational parameters.
+  Assume that we approximate this term as $N$ times a single sample of rows $\tilde{u}_{i}$  and $\tilde{v}_{j}$
+  for a rating $r_{i,j}$. Write out the full objective with this approximation for the last term.
+
+\item  Unfortunately this is difficult to optimize, since the sampled variables depend on the variational parameters $\lambda$. A trick for avoiding this issue, known as \textit{reparameterization}, replaces expectation of the form $\mathbb{E}_{X \sim \mathcal{N}(\mu, \sigma)}[f(X)]$, in terms of $\mathbb{E}_{Z \sim \mathcal{N}(0, 1)}[f(Z \sigma + \mu)]$. Rewrite the objective in this form using sampled dummy variables $\tilde{z}$ (and no
+  $\tilde{u}_{i}$  or $\tilde{v}_{j})$.
+
+\item Using PyTorch, set up this model using \texttt{nn.Embedding} for the variational parameters. For numerical stability, store the log of the variance in
+  the embedding table, and also initialize this table with very low values, e.g. \texttt{logvar.weight.data = -1000}. 
+  For $K = 2$, optimize the variational parameters for 10 epochs over the sampled data.  Use Adam with learning rate 0.001.
+
+Plot the training and test-set log-likelihood as a function of the number of epochs, as well as the marginal likelihood lower bound.
+That is to say: at the end of each epoch, evaluate the log of the average predictive probability of all ratings in the training and test sets using 100 samples from q(U,V).
+The lower bound is the sum of entropy, prior and likelihood terms, while the training-set and test-set likelihoods only use the likelihood term.
+
+\item Fit your variational model for $K = 1$ to $K = 10$, and plot the training-set log-likelihood, test-set log-likelihood, and lower bound for each value of $K$.
+How do the shapes of these curves differ?
+
+
+
+\end{enumerate}
+\end{problem}
+
+
+\begin{problem}[Gibbs Sampling, 25pts].
+
+  In this problem we will consider a different sampling-based approach for
+  estimating the posterior.
+
+
+\begin{enumerate}
+
+\item Write down the conditional equations for U and V.  That is to say, write their conditional distributions, conditioned on all the other variables as well as the training data:
+%
+$$p(U\ |\ V, R )$$
+$$p(V\ |\ U, R )$$
+
+Because the model is bi-linear, these updates should have fairly simple forms.
+
+\item A Gibbs sampler is an alternative model for computing the posteriors of intractable models.
+The method works by repeatedly alternating between drawing samples of $U$ conditioned on $V$, and
+then samples of $V$ conditioned on $U$. (We will derive in greater detail in coming classes).
+
+Give the pseudocode for running this algorithm using the posterior equations from above.
+
+\item Run the Gibbs sampler for 100 steps (i.e. update both $U$ and $V$ 100 times).
+Plot the training and test-set log-likelihood as a function of the number of steps through your training set.
+That is, use all previous samples of $U, V$ to evaluate the predictive probability of all ratings.
+
+\item One reason to be Bayesian is that you don't have to worry about overfitting.
+Run your Gibbs sampler for $K = 1$ to $K = 10$, and plot the training and test-set log-likelihood for each value of $K$.  
+How do the shapes of these curves differ from the curves you saw when doing maximum likelihood estimation in HW3?
+
+
+\end{enumerate}
+\end{problem}
+
+
+\end{document}
