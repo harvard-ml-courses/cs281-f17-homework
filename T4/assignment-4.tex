@@ -128,7 +128,7 @@ each node of the graph, derive local mean field updates.
 \end{center}
 
 
-\item Implement these mean-field updates with a non-synchronous
+\item Implement these mean-field updates with a synchronous
   schedule in PyTorch/numpy. Run for 30 epochs starting with $q$ set
   to a uniform distribution. Graph the results on the small images and
   compare to the brute-force approach. Compare the variational values
@@ -167,8 +167,6 @@ Fix $\sigma_\epsilon^2$ to be 1.0, and start with $K = 2$. We put independent Ga
 \[U_{i,k} \sim \mathcal{N}(0, \sigma_U^2=5)\]
 \[V_{i,k} \sim \mathcal{N}(0, \sigma_V^2=5)\]
 
-
-
 \begin{problem}[Stochastic Variational Inference, 30pts]
 
 Recall that variational inference optimizes a lower bound on the log marginal likelihood (integrating out parameters $\theta$), like so:
@@ -197,17 +195,17 @@ and $\lambda^{(\sigma^2 V)}_{jk}$.
 
 \item Derive the expression for the $KL$ divergence between two univariate Gaussians.
 
-\item Exploiting the conditional independence of the model, we can write the variational loss as:
+\item Exploiting the conditional independence of the model, we can write the variational objective (which we want to maximize) as:
 \[ {\cal L}(\lambda) = -KL(q_\lambda(U)\ ||\  p(U) ) - KL(q_\lambda(V)\ ||\ p(V)) + \sum_{n=1}^N \mathbb{E}_{q_\lambda} \log p(r_n | U, V)\]
 
 Simplify the first two terms of this model to get a closed form expression.
 
 
 \item The third term is the likelihood of the data under an expectation wrt the variational parameters.
-  Assume that we approximate this term as $N$ times a single sample of rows $\tilde{u}_{i}$  and $\tilde{v}_{j}$
-  for a rating $r_{i,j}$. Write out the full objective with this approximation for the last term.
+  Assume that we approximate this term using a single sample of rows $\tilde{u}_{i}$  and $\tilde{v}_{j}$
+  for each rating $r_{i,j}$. Write out the full objective with this approximation for the last term.
 
-\item  Unfortunately this is difficult to optimize, since the sampled variables depend on the variational parameters $\lambda$. A trick for avoiding this issue, known as \textit{reparameterization}, replaces expectation of the form $\mathbb{E}_{X \sim \mathcal{N}(\mu, \sigma)}[f(X)]$, in terms of $\mathbb{E}_{Z \sim \mathcal{N}(0, 1)}[f(Z \sigma + \mu)]$. Rewrite the objective in this form using sampled dummy variables $\tilde{z}$ (and no
+\item  Unfortunately this is difficult to optimize, since the sampled variables depend on the variational parameters $\lambda$. An alternative method, known as \textit{reparameterization}, replaces expectation of the form $\mathbb{E}_{X \sim \mathcal{N}(\mu, \sigma)}[f(X)]$, in terms of $\mathbb{E}_{Z \sim \mathcal{N}(0, 1)}[f(Z \sigma + \mu)]$. Rewrite the objective in this form using sampled dummy variables $\tilde{z}$ (and no
   $\tilde{u}_{i}$  or $\tilde{v}_{j})$.
 
 \item Using PyTorch, set up this model using \texttt{nn.Embedding} for the variational parameters. For numerical stability, store the log of the variance in
