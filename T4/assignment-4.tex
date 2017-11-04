@@ -89,6 +89,8 @@ pixels $n \in \{(i-1, j), (i+1, j), (i, j-1), (i, j+1)\}$,
 \end{cases}
 \]
 
+
+
 \noindent This is obviously a simplified and discretized view of the true denoising problem,
 but it gives us a reasonable place to start. As an example consider the problem with $K=2$
 and noise over the image of a spiral.
@@ -98,6 +100,12 @@ and noise over the image of a spiral.
 \end{center}
 
 
+\noindent [Note: for the example problems we will show k=1 as red, k=2
+as green, and k=3 as blue.  We will represent this as the last
+dimension of the image in a one-hot encoding, so $x[i,j,0] = 1$ for
+red, $x[i,j,1] = 1$ for green, and $x[i,j,2] = 1$ for blue. Here red
+is ``close'' to green and green is close to blue, but red is not close
+to blue. This is not supposed to be physically true, just part of the problem.]
 
 \newpage
 
@@ -128,20 +136,24 @@ each node of the graph, derive local mean field updates.
 \end{center}
 
 
-\item Implement these mean-field updates with a synchronous
-  schedule in PyTorch/numpy. Run for 30 epochs starting with $q$ set
-  to a uniform distribution. Graph the results on the small images and
-  compare to the brute-force approach. Compare the variational values
-  to the exact marginals for the small example. Note: running on the
-  spiral example will likely require a fast/matrix implementation.
+\item Implement these mean-field updates with a synchronous schedule
+  in PyTorch/numpy. (This means that all parameters are updated with
+  expectations from the previous time step.). Run for 30 epochs
+  starting with $q$ set to a uniform distribution. Graph the results
+  on the small images and compare to the brute-force approach. Compare
+  the variational values to the exact marginals for the small
+  example. Note: running on the spiral example will likely require a
+  fast/matrix implementation.
 
-\item Implement Loopy Belief Propagation with a non-synchronous
-  schedule in PyTorch/numpy following the algorithm given in
-  Murphy. Run for 30 epochs starting with $q$ set to a uniform
-  distribution. Compare to the mean field approach.
+\item Implement Loopy Belief Propagation with a synchronous or
+  non-synchronous schedule in PyTorch/Numpy following the algorithm
+  given in Murphy (Section 22.2.2). Run for 30 epochs using the
+  starting conditions in in Algorithm 22.1. Compare to the mean field
+  approach.
 
-\item Write out the Integer Linear Programming formulation for the
-  maximum assignment problem.  What is the advantage of mean field
+\item (Optional)  Write out the Integer Linear Programming formulation for the
+  maximum assignment problem. 
+  What is the advantage of mean field
   compared to the ILP approach?
 
 \item (Optional) Install the PuLP toolkit in python. Implement the ILP
