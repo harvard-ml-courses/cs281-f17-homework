@@ -117,9 +117,8 @@ and the large spiral above.
 
 \begin{enumerate}
 
-
 \item First as a sanity check, consider  the 3x3 image small with $K=2$. Compute using brute-force the
-  true marginal probability $p(y_{i,j})$ of any node.
+  true posterior marginal probability $p(y_{i,j} | x)$ of any node.
 
 \item Now consider a variational-inference based approach to this
   problem. Using mean-field factorization, with $q(y)$ factored to
@@ -247,10 +246,10 @@ How do the shapes of these curves differ?
 
 \item Write down the conditional equations for U and V.  That is to say, write their conditional distributions, conditioned on all the other variables as well as the training data:
 %
-$$p(U\ |\ V, R )$$
-$$p(V\ |\ U, R )$$
+$$p(U_i \ |\ V, R )$$
+$$p(V_j \ |\ U, R )$$
 
-Because the model is bi-linear, these updates should have fairly simple forms.
+Because the model is bi-linear, these updates should have fairly simple forms. Here, we mean $U_i$ to mean the latent parameters corresponding to the $i$th user, and $V_j$ to mean those for the $j$th joke.
 
 \item A Gibbs sampler is an alternative model for computing the posteriors of intractable models.
 The method works by repeatedly alternating between drawing samples of $U$ conditioned on $V$, and
