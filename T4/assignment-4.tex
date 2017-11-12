@@ -176,7 +176,7 @@ r_{i,j} \sim \mathcal{N}(u_i^T v_j, \sigma_\epsilon^2).
 \]
 Fix $\sigma_\epsilon^2$ to be 1.0, and start with $K = 2$. We put independent Gaussian priors on each element of $U$ and $V$:
 \[U_{i,k} \sim \mathcal{N}(0, \sigma_U^2=5)\]
-\[V_{i,k} \sim \mathcal{N}(0, \sigma_V^2=5)\]
+\[V_{j,k} \sim \mathcal{N}(0, \sigma_V^2=5)\]
 
 \begin{problem}[Stochastic Variational Inference, 30pts]
 
@@ -216,8 +216,13 @@ Simplify the first two terms of this model to get a closed form expression.
   Assume that we approximate this term using a single sample of rows $\tilde{u}_{i}$  and $\tilde{v}_{j}$
   for each rating $r_{i,j}$. Write out the full objective with this approximation for the last term.
 
-\item  Unfortunately this is difficult to optimize, since the sampled variables depend on the variational parameters $\lambda$. An alternative method, known as \textit{reparameterization}, replaces expectation of the form $\mathbb{E}_{X \sim \mathcal{N}(\mu, \sigma)}[f(X)]$, in terms of $\mathbb{E}_{Z \sim \mathcal{N}(0, 1)}[f(Z \sigma + \mu)]$. Rewrite the objective in this form using sampled dummy variables $\tilde{z}$ (and no
-  $\tilde{u}_{i}$  or $\tilde{v}_{j})$.
+\item  Unfortunately this is difficult to optimize, since the sampled variables 
+depend on the variational parameters $\lambda$. An alternative method, known as 
+\textit{reparameterization}, replaces expectation of the form 
+$\mathbb{E}_{X \sim \mathcal{N}(\mu, \sigma^2)}[f(X)]$, in terms of 
+$\mathbb{E}_{Z \sim \mathcal{N}(0, 1)}[f(Z \sigma + \mu)]$. Rewrite the 
+objective in this form using sampled dummy variables $\tilde{z}$ 
+(and no $\tilde{u}_{i}$  or $\tilde{v}_{j})$.
 
 \item Using PyTorch, set up this model using \texttt{nn.Embedding} for the variational parameters. For numerical stability, store the log of the variance in
   the embedding table, and also initialize this table with very low values, e.g. \texttt{logvar.weight.data = -1000}. 
