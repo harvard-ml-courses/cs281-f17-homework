@@ -225,7 +225,7 @@ objective in this form using sampled dummy variables $\tilde{z}$
 (and no $\tilde{u}_{i}$  or $\tilde{v}_{j})$.
 
 \item Using PyTorch, set up this model using \texttt{nn.Embedding} for the variational parameters. For numerical stability, store the log of the variance in
-  the embedding table, and also initialize this table with very low values, e.g. \texttt{logvar.weight.data = -1000}. 
+  the embedding table, and also initialize this table with very low values, e.g. \texttt{logvar.weight.data = -10}. 
   For $K = 2$, optimize the variational parameters for 10 epochs over the sampled data.  Use Adam with learning rate 0.001.
 
 Plot the training and test-set log-likelihood as a function of the number of epochs, as well as the marginal likelihood lower bound.
